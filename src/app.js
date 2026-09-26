@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const connectDatabase = require('./config/database');
 const licenseRoutes = require('./routes/licenses');
 
 const app = express();
@@ -15,6 +16,15 @@ app.use(morgan('dev'));
 
 app.get('/health', (req, res) => {
     res.json({ status: 'ok' });
+});
+
+app.use('/api/licenses', async (req, res, next) => {
+    try {
+        await connectDatabase();
+        next();
+    } catch (error) {
+        next(error);
+    }
 });
 
 app.use('/api/licenses', licenseRoutes);
